@@ -1,12 +1,8 @@
 import typer
+from fastapi_cli import init
 
 app = typer.Typer()
-
-
-@app.command()
-def init(project_name: str = "backend"):
-    typer.echo(f"initialation du project avec comme nom {project_name}")
-
+app.add_typer(init.init_app)
 
 
 def main():
