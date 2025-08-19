@@ -41,7 +41,7 @@ def init(project_name: str = typer.Option("", help="Nom du projet FastAPI")):
     if not project_name:
         project_name = typer.prompt(
             "What is the name of your API ?",
-            default="backend"
+            #default="backend"
         )
 
     base = Path(project_name)
