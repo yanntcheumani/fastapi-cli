@@ -1,9 +1,15 @@
 from rich.console import Console
 from pathlib import Path
+import importlib.resources as resources
 
 console = Console()
 
-def create_directory(base, directory_path = Path("fastapi_cli/default_archi")) -> None:
+def create_directory(base: Path, directory_path = None) -> None:
+
+    if directory_path is None:
+        with resources.path("fastapi_cli", "default_archi") as p:
+            directory_path = p
+
     for directory in directory_path.iterdir():
         if directory.is_dir():
             path = base / directory.name

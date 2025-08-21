@@ -29,7 +29,7 @@ fastapi-cli = "fastapi_cli.cli:main"
 
 
 [tool.setuptools.package-data]
-fastapi_cli = ["fastapi_cli/default_archi/**/*"]
+fastapi_cli = ["default_archi/**/*"]
 
 # [tool.setuptools.packages.find]
 # where = ["fastapi_cli"]
