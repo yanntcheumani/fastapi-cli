@@ -26,8 +26,9 @@ def dev(
     console.print(f"🚀 Starting project {project_name} at http://{host}:{port} ...")
 
     uvicorn.run(
-        f"{project_name}.main:app",
+        f"main:app",
         host=host,
         port=port,
-        reload=reload
+        reload=reload,
+        app_dir=project_name
     )
