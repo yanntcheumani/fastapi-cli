@@ -8,16 +8,26 @@ from tests import CommandCli
 runner = CliRunner()
 
 
+import shutil
+from pathlib import Path
+import pytest
+from typer.testing import CliRunner
+
+from fastapi_cli.utils.globals import NAME_CONFIG_FILE
+from fastapi_cli.utils.config.config import load_config
+
+runner = CliRunner()
+
+
 @pytest.fixture(autouse=True)
 def cleanup():
     """Nettoyage automatique des dossiers créés pendant les tests"""
     yield
-    if Path("myproject").exists():
-        shutil.rmtree("myproject")
-    if Path("testproject").exists():
-        shutil.rmtree("testproject")
-    if Path("backend").exists():
-        shutil.rmtree("backend")
+    for d in ["myproject", "testproject", "backend"]:
+        if Path(d).exists():
+            shutil.rmtree(d)
+    if Path(NAME_CONFIG_FILE).exists():
+        Path(NAME_CONFIG_FILE).unlink()
 
 
 def test_init_with_name():
@@ -25,26 +35,44 @@ def test_init_with_name():
     result = runner.invoke(app, [CommandCli.init.value, "--project-name", "myproject"])
 
     assert result.exit_code == 0
+    # Vérifie structure
     assert Path("myproject").exists()
     assert Path("myproject/main.py").exists()
     assert Path("myproject/schemas").exists()
 
+    # Vérifie config.yaml
+    config_path = Path(NAME_CONFIG_FILE)
+    assert config_path.exists()
+    config = load_config(config_path)
+    assert config.ProjectName == "myproject"
+    assert config.schemas == []
+    assert config.modules == []
+
 
 def test_init_prompt(monkeypatch):
     """Test création projet avec input utilisateur"""
-
     monkeypatch.setattr("typer.prompt", lambda text: "backend")
     result = runner.invoke(app, [CommandCli.init.value])
-    
+
     assert result.exit_code == 0
+    # Vérifie structure
     assert Path("backend/schemas").exists()
     assert Path("backend/api").exists()
     assert Path("backend/db").exists()
 
+    # Vérifie config.yaml
+    config = load_config()
+    assert config.ProjectName == "backend"
+    assert config.schemas == []
+    assert config.service == []
+
+
 def test_init_existing_directory():
     """Test si le projet existe déjà"""
+
     Path("myproject").mkdir()
-    result = runner.invoke(app, [CommandCli.init.value, "--project_name", "myproject"])
+    result = runner.invoke(app, [CommandCli.init.value, "--project-name", "myproject"])
 
     assert result.exit_code != 0
 
+    assert not Path(NAME_CONFIG_FILE).exists()

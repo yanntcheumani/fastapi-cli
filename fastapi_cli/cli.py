@@ -8,6 +8,5 @@ app.add_typer(init.app)
 app.add_typer(run.app, name="run", short_help="Command to run the application")
 
 
-
 def main():
     app()
