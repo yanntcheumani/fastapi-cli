@@ -4,12 +4,12 @@ import yaml
 from pathlib import Path
 
 
-from fastapi_cli.utils.globals import NAME_CONFIG_FILE
 
+NAME_CONFIG_FILE = ".fastapi-cli.yaml"
 
 @dataclass
 class BaseClass:
-    path: Path = Path("")
+    path: str = ""
     name: str = ""
 
 @dataclass
@@ -18,6 +18,7 @@ class Router(BaseClass):
 
 @dataclass
 class Schema(BaseClass):
+    path: str = "schemas"
     pass
 
 @dataclass
@@ -28,7 +29,7 @@ class Service(BaseClass):
 @dataclass
 class Module:
     router: Router
-    schemas: Schema
+    schema: Schema
     service: Service
     crud: BaseClass
     middlewares: BaseClass
@@ -40,14 +41,13 @@ class Module:
 class Config:
     modules: List[Module]
     schemas: List[Schema]
-    service: List[Service]
+    services: List[Service]
     ProjectName: str = "backend"
-
-
+    isLoad: bool = False
 
 def load_config(config_path: Path = Path(NAME_CONFIG_FILE)) -> Config:
     if not config_path.exists():
-        return Config()
+        return Config(modules=[], schemas=[], services=[])
     with open(config_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
     return Config(**data)

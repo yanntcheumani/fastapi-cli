@@ -13,8 +13,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from fastapi_cli.utils.globals import NAME_CONFIG_FILE
-from fastapi_cli.utils.config.config import load_config
+from fastapi_cli.utils.config.config import load_config, NAME_CONFIG_FILE
 
 runner = CliRunner()
 
@@ -64,7 +63,7 @@ def test_init_prompt(monkeypatch):
     config = load_config()
     assert config.ProjectName == "backend"
     assert config.schemas == []
-    assert config.service == []
+    assert config.services == []
 
 
 def test_init_existing_directory():

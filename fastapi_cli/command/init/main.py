@@ -1,7 +1,6 @@
 import typer
 from pathlib import Path
 from rich.console import Console
-import yaml
 
 
 from fastapi_cli.command.init._create_directory import create_directory
@@ -33,7 +32,7 @@ def init(project_name: str = typer.Option("", help="Nom du projet FastAPI")):
     create_directory(base)
     create_file(base)
     
-    config = Config(ProjectName=project_name, schemas=[], service=[], modules=[])
+    config = Config(ProjectName=project_name, schemas=[], services=[], modules=[], isLoad=True)
     save_config(config)
     console.print(f"✅ [bold green]Project {project_name} created successfully![/bold green]")
     raise typer.Exit(code=0)
