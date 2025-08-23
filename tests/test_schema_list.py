@@ -42,7 +42,6 @@ def test_list_with_schemas():
     """Test list avec schemas dans config"""
     project_name = init_project()
 
-    # Ajoute un schema dans la config
     schema = Schema(name="Product", path=f"{project_name}/schemas/Product.py")
     config = load_config()
     config.schemas.append(schema)
@@ -52,18 +51,16 @@ def test_list_with_schemas():
 
     assert result.exit_code == 0
     assert "Product" in result.stdout
-    assert "Config" in result.stdout  # source
+    assert "Config" in result.stdout
 
 
 def test_list_with_module_schemas():
     """Test list avec schemas dans un module"""
     project_name = init_project()
 
-    # Ajoute un module avec schema
     schema = {"name": "Order", "path": f"{project_name}/schemas/Order.py"}
     module = Module(router=None, schema=[schema], service=None, crud=None, middlewares=None, name="sales")
     config = load_config()
-    print("voici la classe par defaut: ", config)
     config.modules.append(module)
     save_config(config)
 

@@ -12,7 +12,7 @@ console = Console()
 config = load_config()
 
 @app.command()
-def create(name: Annotated[str, typer.Argument(help="Who to greet", show_default=False)]):
+def create(name: Annotated[str, typer.Argument(help="Name of the Schema", show_default=False)]):
     """
     Create a Schema file and structure with
     """

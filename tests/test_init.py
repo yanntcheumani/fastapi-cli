@@ -34,12 +34,10 @@ def test_init_with_name():
     result = runner.invoke(app, [CommandCli.init.value, "--project-name", "myproject"])
 
     assert result.exit_code == 0
-    # Vérifie structure
     assert Path("myproject").exists()
     assert Path("myproject/main.py").exists()
     assert Path("myproject/schemas").exists()
 
-    # Vérifie config.yaml
     config_path = Path(NAME_CONFIG_FILE)
     assert config_path.exists()
     config = load_config(config_path)
@@ -54,12 +52,10 @@ def test_init_prompt(monkeypatch):
     result = runner.invoke(app, [CommandCli.init.value])
 
     assert result.exit_code == 0
-    # Vérifie structure
     assert Path("backend/schemas").exists()
     assert Path("backend/api").exists()
     assert Path("backend/db").exists()
 
-    # Vérifie config.yaml
     config = load_config()
     assert config.ProjectName == "backend"
     assert config.schemas == []
