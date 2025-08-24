@@ -12,12 +12,12 @@ console = Console()
 config = load_config()
 
 @app.command()
-def create(name: Annotated[str, typer.Argument(help="Name of the Schema", show_default=False)]):
+def create(name: Annotated[str, typer.Argument(help="Name of the Schema")]):
     """
     Create a Schema file and structure with
     """
     
-
+    name[0].upper()
     schema = Schema(name=name)
     file = f"""
 from pydantic import BaseModel
@@ -31,7 +31,7 @@ class {schema.name}Out({schema.name}Base):
     pass
 """
 
-    schema.path = config.ProjectName + "/" + schema.path + "/" + str(schema.name) + ".py"
+    schema.path = str(config.ProjectName + "/" + schema.path + "/" + str(schema.name) + ".py")
 
     filepath = Path(schema.path)
 

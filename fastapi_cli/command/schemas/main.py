@@ -1,17 +1,14 @@
 import typer
 from rich.console import Console
-import uvicorn
-from pathlib import Path
 
-from fastapi_cli.utils.config.config import Config, load_config
-from fastapi_cli.command.schemas import create
-from fastapi_cli.command.schemas import list
+from fastapi_cli.command.schemas import create, list, update
+
 
 app = typer.Typer()
 app.add_typer(create.app, short_help="Command to create Schema")
 app.add_typer(list.app, short_help="List all Schemas")
+app.add_typer(update.app, short_help="Update Schema")
 
 
 console = Console()
-config = load_config()
 

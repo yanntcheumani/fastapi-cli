@@ -2,6 +2,7 @@ from dataclasses import dataclass, asdict
 from typing import List
 import yaml
 from pathlib import Path
+from dacite import from_dict
 
 
 
@@ -19,6 +20,7 @@ class Router(BaseClass):
 @dataclass
 class Schema(BaseClass):
     path: str = "schemas"
+    inModule: bool = False
     pass
 
 @dataclass
@@ -28,11 +30,11 @@ class Service(BaseClass):
 
 @dataclass
 class Module:
-    router: Router
-    schema: Schema
-    service: Service
-    crud: BaseClass
-    middlewares: BaseClass
+    router: Router | None
+    schema: Schema | None
+    service: Service | None
+    crud: BaseClass | None
+    middlewares: BaseClass | None
     name: str = ""
 
 
@@ -45,12 +47,34 @@ class Config:
     ProjectName: str = "backend"
     isLoad: bool = False
 
+    def get_schemas(self) -> List[Schema]:
+        return self.schemas.copy() + [module.schema for module in self.modules if module.schema]
+    
+
+    def get_name_of_schemas(self) -> List[str]:
+        return [schema.name for schema in self.schemas] + [module.schema.name for module in self.modules if module.schema]
+
+    def get_schema(self, name: str) -> Schema:
+        for schema in self.schemas:
+            if schema.name == name:
+                return schema
+        
+        for module in self.modules:
+            if not module.schema:
+                continue
+
+            if module.schema.name == name:
+                return module.schema
+
+        return None
+
 def load_config(config_path: Path = Path(NAME_CONFIG_FILE)) -> Config:
     if not config_path.exists():
         return Config(modules=[], schemas=[], services=[])
     with open(config_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
-    return Config(**data)
+    return from_dict(data_class=Config, data=data)
+
 
 def save_config(config: Config, config_path: Path = Path(NAME_CONFIG_FILE)):
     with open(config_path, "w", encoding="utf-8") as f:

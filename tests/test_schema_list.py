@@ -59,14 +59,13 @@ def test_list_with_module_schemas():
     project_name = init_project()
 
     schema = {"name": "Order", "path": f"{project_name}/schemas/Order.py"}
-    module = Module(router=None, schema=[schema], service=None, crud=None, middlewares=None, name="sales")
+    module = Module(router=None, schema=schema, service=None, crud=None, middlewares=None, name="sales")
     config = load_config()
     config.modules.append(module)
     save_config(config)
 
     result = runner.invoke(app, ["schemas", "list"])
-
-    print("bonjour : ", result.output)
+    print("bonjour: ", result.exception)
 
     assert result.exit_code == 0
     assert "Order" in result.stdout

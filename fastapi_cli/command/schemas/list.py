@@ -13,14 +13,12 @@ def _add_schema_in_table(schemas: List[Schema] | Schema, table: Table, source: s
     if type(schemas) is Schema:
         name = schemas.name
         path = schemas.path
-        table.add_row(schemas, name, str(path))
+        table.add_row(source, name, str(path))
         return
-    
-        
-    for schema in schemas:
 
-        name = schema["name"]
-        path = schema["path"]
+    for schema in schemas:
+        name = schema.name
+        path = schema.path
         table.add_row(source, name, str(path))
 
 

@@ -28,10 +28,8 @@ def init_project(name="backend"):
     return name
 
 
-# -------- Tests pour la commande CREATE --------
-
 def test_create_schema_file():
-    """Test création d’un schema avec la commande create"""
+    """Test création d'un schema avec la commande create"""
     project_name = init_project()
 
     result = runner.invoke(app, ["schemas", "create", "User"])
@@ -43,7 +41,7 @@ def test_create_schema_file():
     assert "class UserBase(BaseModel)" in content
 
     config = load_config()
-    assert any(s["name"] == "User" for s in config.schemas)
+    assert any(s.name == "User" for s in config.schemas)
 
 
 def test_create_schema_already_exists():
