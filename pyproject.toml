@@ -17,7 +17,9 @@ dependencies = [
     "fastapi>=0.110.0",
     "SQLAlchemy>=2.0.30",
     "pydantic-settings>=2.2.1",
-    "PyYAML>=6.0.2"
+    "PyYAML>=6.0.2",
+    "InquirerPy>=0.3.4",
+    "dacite>=1.9.2"
 ]
 license = { text = "MIT" }
 

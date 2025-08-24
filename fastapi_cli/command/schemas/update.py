@@ -64,4 +64,3 @@ def update():
     _update_files(new_schema_name, schema)
     schema.name = new_schema_name
     save_config(config)
-    console.print("[green]all of the are [/]")

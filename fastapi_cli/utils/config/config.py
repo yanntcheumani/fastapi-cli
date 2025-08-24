@@ -67,6 +67,14 @@ class Config:
                 return module.schema
 
         return None
+    
+    def delete_schema(self, schema: Schema):
+        self.schemas = [s for s in self.schemas if s.name != schema.name]
+
+        for module in self.modules:
+            if module.schema and module.schema.name == schema.name:
+                module.schema = None
+
 
 def load_config(config_path: Path = Path(NAME_CONFIG_FILE)) -> Config:
     if not config_path.exists():
