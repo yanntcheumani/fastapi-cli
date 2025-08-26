@@ -56,6 +56,7 @@ class SubModule:
 class Module:
     submodules: List[SubModule] = None
     name: str = "v1"
+    version: int = 1
 
 
 
@@ -67,6 +68,11 @@ class Config:
     middlewares: List[BaseClass] | None = None
     ProjectName: str = "backend"
     isLoad: bool = False
+
+
+    def get_name_of_modules(self):
+        return [module.name for module in self.modules]
+    
 
     def get_schemas(self) -> List[Schema]:
         list_schema = self.schemas.copy()
