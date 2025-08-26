@@ -1,0 +1,5 @@
+[run]
+omit =
+    fastapi_cli/default_archi/*
+    __init*
+    main*

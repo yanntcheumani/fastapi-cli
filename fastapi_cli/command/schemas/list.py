@@ -1,7 +1,6 @@
 import typer
 from rich.console import Console
 from rich.table import Table
-from pathlib import Path
 
 from fastapi_cli.utils.config.config import load_config, Schema
 from typing import List
@@ -37,7 +36,8 @@ def list():
     _add_schema_in_table(config.schemas, table, "Config")
 
     for mod in config.modules:
-        _add_schema_in_table(mod.schema, table, f"Module: {mod.name}")
+        for submodule in mod.submodules:
+            _add_schema_in_table(submodule.schemas, table, f"Module: {mod.name}")
 
     if len(table.rows) == 0:
         console.print("[yellow]No schemas found in config or modules.[/]")

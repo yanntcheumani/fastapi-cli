@@ -19,7 +19,9 @@ dependencies = [
     "pydantic-settings>=2.2.1",
     "PyYAML>=6.0.2",
     "InquirerPy>=0.3.4",
-    "dacite>=1.9.2"
+    "dacite>=1.9.2",
+    "coverage>=7.10.5",
+    "pytest-cov>=6.2.1"
 ]
 license = { text = "MIT" }
 
