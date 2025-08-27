@@ -6,6 +6,8 @@ from rich.console import Console
 from fastapi_cli.command.init._create_directory import create_directory
 from fastapi_cli.command.init._create_file import create_file
 from fastapi_cli.utils.config.config import Config, save_config, Module
+from fastapi_cli.command.modules.submodules.create import create as create_submodule
+from fastapi_cli.command.modules.create import create as create_module
 
 console = Console()
 app = typer.Typer()
@@ -29,12 +31,14 @@ def init(project_name: str = typer.Option("", help="Nom du projet FastAPI")):
         console.print(f"❌ [red]Le dossier {project_name} existe déjà[/red]")
         raise typer.Exit(code=1)
 
+
     create_directory(base)
     create_file(base)
-    
+
     config = Config(ProjectName=project_name, schemas=[], services=[], modules=[], isLoad=True)
-    module = Module(submodules=[])
-    config.modules.append(module)
     save_config(config)
+    create_module("v1")
+
+    create_submodule("default")
     console.print(f"✅ [bold green]Project {project_name} created successfully![/bold green]")
     raise typer.Exit(code=0)

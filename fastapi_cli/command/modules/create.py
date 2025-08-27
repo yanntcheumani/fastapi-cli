@@ -35,10 +35,7 @@ def _create_module(config: Config, name_path: Path, module: Module) -> bool:
 from fastapi import APIRouter
 
 router_{module.name} = APIRouter()
-
-@router_{module.name}.get("/")
-def read_root():
-    return """ + "{'Hello': 'World'}"
+"""
 
     name_path_router = name_path / "router.py"
     name_path_router.write_text(router_file_content)

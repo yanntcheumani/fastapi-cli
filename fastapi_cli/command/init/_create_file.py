@@ -20,5 +20,5 @@ def create_file(base, directory_path = None):
             new_file.write_text(file.read_text())
             console.print(f"📝 Created file: [cyan]{new_file}[/cyan]")
 
-        if file.is_dir():
+        if file.is_dir()  and file.name != "v1":
             create_file(new_file, file)

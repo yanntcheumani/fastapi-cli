@@ -47,7 +47,7 @@ class Service:
 @dataclass
 class SubModule:
     name: str | None
-
+    path: str | None
     routers: List[Router] | None
     schemas: List[Schema] | None
     services: List[Service] | None
@@ -57,6 +57,12 @@ class Module:
     submodules: List[SubModule] = None
     name: str = "v1"
     version: int = 1
+
+    def is_submodule_exist(self, name: str) -> bool:
+        for submodule in self.submodules:
+            if submodule.name == name:
+                return True
+        return False
 
 
 
@@ -73,6 +79,12 @@ class Config:
     def get_name_of_modules(self):
         return [module.name for module in self.modules]
     
+    def get_module_by_name(self, name: str) -> Module:
+        for module in self.modules:
+            if module.name == name:
+                return module
+
+        return None
 
     def get_schemas(self) -> List[Schema]:
         list_schema = self.schemas.copy()
@@ -126,3 +138,4 @@ def load_config(config_path: Path = Path(NAME_CONFIG_FILE)) -> Config:
 def save_config(config: Config, config_path: Path = Path(NAME_CONFIG_FILE)):
     with open(config_path, "w", encoding="utf-8") as f:
         yaml.safe_dump(asdict(config), f, sort_keys=False, allow_unicode=True)
+    print("fichier sauvegardé")
