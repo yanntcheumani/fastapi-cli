@@ -4,7 +4,7 @@ import pytest
 from typer.testing import CliRunner
 
 from fastapi_cli.cli import app
-from fastapi_cli.utils.config.config import load_config, save_config, Config, Schema, Module, NAME_CONFIG_FILE
+from fastapi_cli.utils.config.config import load_config, save_config, Config, Schema, Module, NAME_CONFIG_FILE, SubModule
 from tests import CommandCli
 
 runner = CliRunner()
@@ -29,7 +29,7 @@ def init_project(name="backend"):
 
 
 def test_list_no_schemas(monkeypatch):
-    """Test list quand aucun schema n’existe"""
+    """Test list quand aucun schema n'existe"""
     init_project()
 
     result = runner.invoke(app, ["schemas", "list"])
@@ -59,7 +59,8 @@ def test_list_with_module_schemas():
     project_name = init_project()
 
     schema = {"name": "Order", "path": f"{project_name}/schemas/Order.py"}
-    module = Module(router=None, schema=schema, service=None, crud=None, middlewares=None, name="sales")
+    submodule = SubModule(schemas=[schema], routers=[], name="User", services=[])
+    module = Module(submodules=[submodule], name="sales")
     config = load_config()
     config.modules.append(module)
     save_config(config)

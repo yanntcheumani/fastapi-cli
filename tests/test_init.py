@@ -43,7 +43,7 @@ def test_init_with_name():
     config = load_config(config_path)
     assert config.ProjectName == "myproject"
     assert config.schemas == []
-    assert config.modules == []
+    assert len(config.modules) == 1
 
 
 def test_init_prompt(monkeypatch):
