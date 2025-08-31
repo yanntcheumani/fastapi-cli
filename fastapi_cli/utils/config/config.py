@@ -25,17 +25,20 @@ class Router:
     """
         Cette class permet de faire une route specifique pour management specifique sur un schema ou model (supprimer, récuperer, editer, etc)
     """
-    method: HttpMethod | None
+    method: str | None
     schema: str | None
     path: str = ""
-    name: str = ""
-
+    router_name: str = ""
+    url_name: str = ""
 
 @dataclass
 class Schema:
     inModule: bool = False
     path: str = "schemas"
     name: str = ""
+
+    def __repr__(self):
+        return f"<Schema(name={self.name}, path={self.path}, inModule={self.inModule})"
 
 @dataclass
 class Service:
@@ -51,6 +54,29 @@ class SubModule:
     routers: List[Router] | None
     schemas: List[Schema] | None
     services: List[Service] | None
+    name_module: str | None
+
+    def get_name_of_routers(self) -> List[str]:
+        list_name_router = [router.name for router in self.routers] 
+
+        return list_name_router
+
+    def get_router_by_name(self, name: str) -> Router:
+        for router in self.routers:
+            if router.router_name == name:
+                return router
+        return None
+
+    def get_name_of_schemas(self) -> List[str]:
+        return [schema.name for schema in self.schemas]
+    
+    def is_router_exist(self, method_name, url_name) -> bool:
+        
+        for router in self.routers:
+            if router.method == method_name and router.url_name == url_name:
+                return True
+        return False
+
 
 @dataclass
 class Module:
@@ -60,9 +86,13 @@ class Module:
 
     def is_submodule_exist(self, name: str) -> bool:
         for submodule in self.submodules:
-            if submodule.name == name:
-                return True
+            if submodule.name == name: return True
         return False
+    
+    def get_submodule_by_name(self, name: str) -> SubModule:
+        for submodule in self.submodules:
+            if submodule.name == name: return submodule
+        return submodule
 
 
 
@@ -75,14 +105,18 @@ class Config:
     ProjectName: str = "backend"
     isLoad: bool = False
 
-
+    def get_submodule_by_name(self, name: str) -> SubModule:
+        for module in self.modules:
+            submodule = module.get_submodule_by_name(name)
+            if submodule: return submodule
+        return None
+ 
     def get_name_of_modules(self):
         return [module.name for module in self.modules]
     
     def get_module_by_name(self, name: str) -> Module:
         for module in self.modules:
-            if module.name == name:
-                return module
+            if module.name == name: return module
 
         return None
 
@@ -114,10 +148,15 @@ class Config:
         for modules in self.modules:
             for submodule in modules.submodules:
                 for schema in submodule.schemas:
-                    if schema.name: return schema
+                    if schema.name == name: return schema
 
         return None
     
+    def get_name_with_one_submodule(self, submodule: SubModule) -> List[str]:
+        list_name_schema = [schema.name for schema in self.schemas] 
+        
+        return list_name_schema + submodule.get_name_of_schemas()
+
     def delete_schema(self, schema: Schema):
         self.schemas = [s for s in self.schemas if s.name != schema.name]
 
@@ -138,4 +177,3 @@ def load_config(config_path: Path = Path(NAME_CONFIG_FILE)) -> Config:
 def save_config(config: Config, config_path: Path = Path(NAME_CONFIG_FILE)):
     with open(config_path, "w", encoding="utf-8") as f:
         yaml.safe_dump(asdict(config), f, sort_keys=False, allow_unicode=True)
-    print("fichier sauvegardé")

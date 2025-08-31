@@ -1,11 +1,13 @@
 import typer
 from rich.console import Console
-
+from rich.prompt import Prompt
 from pathlib import Path
 from typing_extensions import Annotated
 from InquirerPy import inquirer
+from typing import List
 
-from fastapi_cli.utils.config.config import load_config, Module, save_config, Config, SubModule, Schema
+from fastapi_cli.command.modules.submodules.create_router import create_router_content
+from fastapi_cli.utils.config.config import load_config, Module, save_config, Config, SubModule, Schema, Router
 
 app = typer.Typer()
 console = Console()
@@ -24,11 +26,12 @@ def _get_module(config: Config) -> Module:
     module = config.get_module_by_name(name_module)
     return module
 
-def _create_schema(config: Config, submodule: SubModule):
+def _create_schema(config: Config, submodule: SubModule, schema_name: str = None):
 
-    name = Console.input("📝 what is the name of the schema :")
-    name[0].upper()
-    schema = Schema(name=name)
+    if not schema_name:
+        schema_name = Prompt.ask(f"📝 what is the name of the schema")
+        schema_name[0].upper()
+    schema = Schema(name=schema_name)
     file = f"""
 from pydantic import BaseModel
 
@@ -112,10 +115,115 @@ def create(
 
 
     name_path = Path(config.ProjectName + "/api/" + module.name + "/endpoints/" + name.replace(" ", "_") + ".py")
-    submodule = SubModule(name=name.replace(" ", "_"), path=str(name_path), schemas=[], services=[], routers=[])
+    submodule = SubModule(name=name.replace(" ", "_"), path=str(name_path), schemas=[], services=[], routers=[], name_module=module.name)
     if schema:
         _create_schema(config, submodule)
     _create_file(name_path, submodule, module, config)
     module.submodules.append(submodule)
     save_config(config)
     console.print(f"💥 [green] submodule created with success ![/]")
+
+
+@app.command()
+def create_schema(
+    name_submodule: Annotated[str, typer.Argument(help="Name of the SubModule")],
+    name_schema: Annotated[str, typer.Argument(help="Name of the schema")], 
+):
+    """
+    this command create schema in the submodule
+    """
+
+    config = load_config()
+
+    if config.get_schema(name_schema):
+        console.print(f"💥 [red] {name_schema} Schema already exist ! [/]")
+        raise typer.Exit(code=1)
+
+    submodule: SubModule = config.get_submodule_by_name(name_submodule)
+
+    _create_schema(config, submodule, name_schema)
+
+    save_config(config)
+
+
+def _get_schema(config: Config, submodule: SubModule) -> str:
+    names_schemas = config.get_name_with_one_submodule(submodule) + ["None", "List"]
+    name_schema = inquirer.select(
+            message="Choose the type of your router :",
+            choices=names_schemas,
+            default=names_schemas[0],
+        ).execute()
+    
+    if name_schema == "None":
+        return name_schema
+    
+    if name_schema == "List":
+        tmp_schemas = config.get_name_with_one_submodule(submodule)
+        tmp_schema = inquirer.select(
+            message="Choose the type of your router :",
+            choices=tmp_schemas,
+            default=tmp_schemas[0],
+        ).execute()
+
+        name_schema = name_schema + "[" + tmp_schema + "Out]"
+        return name_schema
+    
+    return name_schema + "Out"
+
+
+
+@app.command()
+def create_router(
+    name_submodule: Annotated[str, typer.Argument(help="Name of the SubModule")],
+    name_router: Annotated[str, typer.Argument(help="Name of the router")], 
+):
+    config = load_config()
+    all_method = ["post", "get", "put", "delete"]
+
+    submodule: SubModule = config.get_submodule_by_name(name_submodule)
+
+    if submodule.get_router_by_name(name_router):
+        console.print(f"💥 [red] {name_router} router already exist ! [/]")
+        raise typer.Exit(code=1)
+
+
+    name_method: str = inquirer.select(
+        message="Choose the type of your router :",
+        choices=all_method,
+        default=all_method[0],
+    ).execute()
+    name_url = Prompt.ask(f"📝 what is the name of the url (by default it will be '/')", default="")
+    name_schema = _get_schema(config, submodule)
+
+    if submodule.is_router_exist(name_method, name_url):
+        console.print(f"💥 [red] the url: {name_url} with the method {name_method} already exist ![/]")
+        raise typer.Exit(code=1)
+
+    create_router_content(config, name_method, name_router, name_url, name_schema, submodule)
+    
+    
+    router = Router(method=name_method, schema=name_schema, router_name=name_router, url_name=name_url)
+    submodule.routers.append(router)
+    save_config(config)
+    console.print(
+        f"[bold green]📡 Router[/bold green] [cyan]{name_router}[/cyan] "
+        f"a bien été ajouté au submodule [magenta]{submodule.name}[/magenta] 🎉"
+    )
+
+@app.command()
+def delete_router(
+    name_submodule: Annotated[str, typer.Argument(help="Name of the SubModule")],
+    name_router: Annotated[str, typer.Argument(help="Name of the router")], 
+):
+    config = load_config()
+    submodule: SubModule = config.get_submodule_by_name(name_submodule)
+
+    if not submodule.get_router_by_name(name_router):
+        console.print(f"💥 [red] {name_router} submodule not exist ! [/]")
+        raise typer.Exit(code=1)
+    
+    router: Router = submodule.get_router_by_name(name_router)
+
+    if not router:
+        console.print(f"💥 [red] {name_router} routernot exist ! [/]")
+        raise typer.Exit(code=1)
