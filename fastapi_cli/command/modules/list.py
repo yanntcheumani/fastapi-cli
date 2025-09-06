@@ -45,7 +45,7 @@ def list(name: Annotated[str, typer.Argument(help="Module name (optional). If em
                 # Routers
                 if sub.routers:
                     for router in sub.routers:
-                        table.add_row(" └─ Router", router.name, f"{router.method.upper()} {router.path} (schema={router.schema})")
+                        table.add_row(" └─ Router", router.router_name, f"{router.method.upper()} {router.path} {router.url_name} (schema={router.schema})")
 
         console.print(table)
 

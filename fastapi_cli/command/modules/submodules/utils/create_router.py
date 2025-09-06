@@ -77,7 +77,8 @@ def create_router_content(
     name_method: str,
     name_router: str,
     name_url: str,
-    name_schema: str,
+    name_schema_out: str,
+    name_schema_in: str,
     submodule: SubModule
 ):
     url = _get_name_url(name_url)
@@ -85,7 +86,7 @@ def create_router_content(
 @router.{name_method}(
     "/{url}",
     status_code=status.HTTP_200_OK,
-    {_get_response_model(name_schema)} 
+    {_get_response_model(name_schema_out)} 
     tags=["{submodule.name_module}:{submodule.name}"]
 )
 async def {name_router}():
@@ -93,8 +94,8 @@ async def {name_router}():
 
     submodule_path = Path(submodule.path)
 
-    if "List" in name_schema:
-        _check_import(name_schema, submodule_path)
+    if "List" in name_schema_out:
+        _check_import(name_schema_out, submodule_path)
     
     if submodule_path.exists():
         with open(submodule_path, "a", encoding="utf-8") as f:
@@ -105,4 +106,5 @@ async def {name_router}():
             f.write("router = APIRouter()\n")
             f.write(file_content)
     
-    _import_schema(name_schema, submodule_path)
+    _import_schema(name_schema_out, submodule_path)
+    _import_schema(name_schema_in, submodule_path)
